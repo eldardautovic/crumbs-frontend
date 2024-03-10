@@ -1,19 +1,27 @@
-import { LayoutName, Layouts } from "@/layouts";
-import "@/styles/globals.css";
-import { ThemeProvider } from "next-themes";
-import type { AppLayoutProps } from "next/app";
+import { lazy } from 'react';
+import type { AppLayoutProps } from 'next/app';
+import { ThemeProvider } from 'next-themes';
+
+import { LayoutName, Layouts } from '@/layouts';
+
+import '@/styles/globals.css';
+
+const LazyAuthProvider = lazy(() => import('@/context/AuthContext'));
 
 export default function App({ Component, pageProps }: AppLayoutProps) {
-  const CurrentLayout =
-    Layouts[(Component.activeLayout as LayoutName) ?? "Default"];
+  const CurrentLayout = Layouts[(Component.activeLayout as LayoutName) ?? 'Default'];
 
-  const getLayout = (children: React.ReactNode) => (
-    <CurrentLayout>{children}</CurrentLayout>
-  );
+  const getLayout = (children: React.ReactNode) => <CurrentLayout>{children}</CurrentLayout>;
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      {getLayout(<Component {...pageProps} />)}
-    </ThemeProvider>
+    <LazyAuthProvider>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+      >
+        {getLayout(<Component {...pageProps} />)}
+      </ThemeProvider>
+    </LazyAuthProvider>
   );
 }

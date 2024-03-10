@@ -1,13 +1,12 @@
-import { Inter } from "next/font/google";
+import { NextPage } from 'next';
+import { Inter } from 'next/font/google';
 
-import { NextPage } from "next";
-
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 const Home: NextPage = () => {
-  return <main className={`${inter.className}`}></main>;
+  return <main className={`${inter.className}`}> Elcic mafija</main>;
 };
 
-Home.activeLayout = "Default";
+Home.activeLayout = 'Default';
 
 export default Home;

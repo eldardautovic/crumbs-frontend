@@ -1,5 +1,5 @@
-import Blank from "./blank";
-import Default from "./default";
+import Blank from './blank';
+import Default from './default';
 
 export const Layouts = {
   Default,

@@ -1,11 +1,11 @@
-import IconLogo from "@/components/Icons/IconLogo/IconLogo";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { NextPage } from 'next';
+import Head from 'next/head';
+import Link from 'next/link';
 
-import { NextPage } from "next";
-
-import Head from "next/head";
+import IconLogo from '@/components/Icons/IconLogo/IconLogo';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 const Login: NextPage = () => {
   return (
@@ -28,19 +28,24 @@ const Login: NextPage = () => {
                   <h1 className="text-7xl font-black dark:text-gray-100 text-orange-400">
                     crumbs.
                   </h1>
-                  <p className="text-gray-500 dark:text-gray-400">
-                    Delicious links
-                  </p>
+                  <p className="text-gray-500 dark:text-gray-400">Delicious links</p>
                 </div>
               </div>
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" placeholder="m@example.com" type="email" />
+                  <Input
+                    id="email"
+                    placeholder="m@example.com"
+                    type="email"
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
-                  <Input id="password" type="password" />
+                  <Input
+                    id="password"
+                    type="password"
+                  />
                 </div>
                 <Button className="w-full">Sign in</Button>
                 <div className="flex items-center justify-center space-x-4">
@@ -48,9 +53,16 @@ const Login: NextPage = () => {
                   <p className="text-sm text-gray-500 dark:text-gray-400">OR</p>
                   <div className="w-1/2 border-t border-gray-200 dark:border-gray-800" />
                 </div>
-                <Button className="w-full" variant="outline">
-                  Sign up
-                </Button>
+                <div>
+                  <Link href="/register">
+                    <Button
+                      className="w-full"
+                      variant="outline"
+                    >
+                      Sign up
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
@@ -60,6 +72,6 @@ const Login: NextPage = () => {
   );
 };
 
-Login.activeLayout = "Blank";
+Login.activeLayout = 'Blank';
 
 export default Login;
