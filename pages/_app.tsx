@@ -2,6 +2,7 @@ import { lazy } from "react";
 import type { AppLayoutProps } from "next/app";
 import { ThemeProvider } from "next-themes";
 
+import { Toaster } from "@/components/ui/toaster";
 import { LayoutName, Layouts } from "@/layouts";
 
 import "@/styles/globals.css";
@@ -20,6 +21,7 @@ export default function App({ Component, pageProps }: AppLayoutProps) {
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <LazyAuthProvider>
         {getLayout(<Component {...pageProps} />)}
+        <Toaster />
       </LazyAuthProvider>
     </ThemeProvider>
   );

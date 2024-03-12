@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { AxiosError } from "axios";
 import clsx from "clsx";
 import Link from "next/link";
 
@@ -10,6 +11,7 @@ import apiClient from "@/lib/axios";
 import { LoginUser, LoginUserResponse } from "@/types/auth/auth";
 import { ResponseData } from "@/types/response/response";
 
+import { useToast } from "../../hooks/useToast";
 import IconLogo from "../Icons/IconLogo";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -20,6 +22,8 @@ const LoginForm = () => {
 
   const { register, handleSubmit } = useForm<LoginUser>();
   const { authenticateUser } = useAuth();
+
+  const { toast } = useToast();
 
   const onSubmit = async (data: LoginUser) => {
     try {
@@ -32,9 +36,20 @@ const LoginForm = () => {
 
       if (response) {
         await authenticateUser(response.data.data.token);
+
+        toast({ title: "Logged in", description: "Successfully logged in." });
       }
     } catch (err) {
-      console.log(err);
+      if (err instanceof AxiosError) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: err.response?.data.message,
+        });
+      } else {
+        console.error(err);
+      }
+
       setLoading(false);
     } finally {
       setLoading(false);

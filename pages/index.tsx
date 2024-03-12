@@ -1,12 +1,20 @@
-import { NextPage } from 'next';
-import { Inter } from 'next/font/google';
+import { NextPage } from "next";
+import { Inter } from "next/font/google";
 
-const inter = Inter({ subsets: ['latin'] });
+import UnauthorizedDrawer from "@/components/UnauthorizedDrawer/UnauthorizedDrawer";
+
+const inter = Inter({ subsets: ["latin"] });
 
 const Home: NextPage = () => {
-  return <main className={`${inter.className}`}> Elcic mafija</main>;
+  return (
+    <main className={`${inter.className}`}>
+      {" "}
+      Elcic mafija
+      <UnauthorizedDrawer />
+    </main>
+  );
 };
 
-Home.activeLayout = 'Default';
+Home.activeLayout = "Default";
 
 export default Home;

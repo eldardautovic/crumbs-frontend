@@ -1,4 +1,6 @@
-import { Head, Html, Main, NextScript } from 'next/document';
+import { Head, Html, Main, NextScript } from "next/document";
+
+import { Toaster } from "@/components/ui/toaster";
 
 export default function Document() {
   return (

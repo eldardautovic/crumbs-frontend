@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 
-import IconSpinner from "@/components/Icons/IconSpinner";
 import Spinner from "@/components/ui/Spinner";
+import { useToast } from "@/hooks/useToast";
 import apiClient from "@/lib/axios";
-import { User } from "@/types/user/user";
+import { ResponseData } from "@/types/response/response";
+import { User, VerifyUser } from "@/types/user/user";
 
 export interface AuthContextType {
   user: User | null;
@@ -23,18 +24,21 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const { toast } = useToast();
+
   useEffect(() => {
     setIsLoading(true);
     const token = localStorage.getItem("token");
     apiClient.defaults.headers.common.Authorization = `Bearer ${token}`;
     getUserProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getUserProfile = async () => {
     let isAuthenticated = false;
     try {
-      const { data } = await apiClient.get<{ data: User }>("/user");
-      setUser(data.data);
+      const { data } = await apiClient.get<ResponseData<VerifyUser>>("/user");
+      setUser(data.data.user);
       isAuthenticated = true;
       if (
         router.pathname.includes("login") ||
@@ -65,12 +69,13 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     delete apiClient.defaults.headers.common.Authorization;
     localStorage.removeItem("token");
     setUser(null);
-    router.push("/login");
+    await router.push("/login");
+    toast({ title: "Logged out", description: "Successfully logged out." });
   };
 
-  if (isLoading) {
-    return <Spinner />;
-  }
+  // if (isLoading) {
+  //   return <Spinner />;
+  // }
   return (
     <AuthContext.Provider
       value={{

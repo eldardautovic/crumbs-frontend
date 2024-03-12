@@ -3,9 +3,11 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Label } from "@radix-ui/react-label";
+import { AxiosError } from "axios";
 import Link from "next/link";
 
 import useAuth from "@/hooks/useAuth";
+import { useToast } from "@/hooks/useToast";
 import apiClient from "@/lib/axios";
 import { RegisterUser, RegisterUserResponse } from "@/types/auth/auth";
 import { ResponseData } from "@/types/response/response";
@@ -21,6 +23,8 @@ const RegisterForm = () => {
 
   const { authenticateUser } = useAuth();
 
+  const { toast } = useToast();
+
   const onSubmit = async (data: RegisterUser) => {
     try {
       setLoading(true);
@@ -31,8 +35,21 @@ const RegisterForm = () => {
       );
 
       await authenticateUser(response.data.data.token);
+
+      toast({
+        title: "Welcome",
+        description: "Successfully registered, welcome.",
+      });
     } catch (err) {
-      console.log(err);
+      if (err instanceof AxiosError) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: err.response?.data.message,
+        });
+      } else {
+        console.error(err);
+      }
     } finally {
       setLoading(false);
     }

@@ -7,13 +7,22 @@ import useAuth from "@/hooks/useAuth";
 import IconDarkMode from "../Icons/IconDarkMode";
 import IconLightMode from "../Icons/IconLightMode";
 import IconLogo from "../Icons/IconLogo";
+import IconSpinner from "../Icons/IconSpinner";
 
+import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { Button } from "./button";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
 const NavBar = () => {
   const { setTheme, theme } = useTheme();
-  const { logout } = useAuth();
+  const { logout, user, isLoading } = useAuth();
+
+  function getInitials(name: string) {
+    const nameArray = name.split(" ");
+    const firstNameIn = nameArray[0].charAt(0).toUpperCase();
+    const lastNameIn = nameArray[nameArray.length - 1].charAt(0).toUpperCase();
+    return firstNameIn + lastNameIn;
+  }
 
   return (
     <nav className="py-5 flex justify-between items-center">
@@ -25,14 +34,26 @@ const NavBar = () => {
           crumbs.
         </h5>
       </div>
-      <div className="flex items-center gap-x-2">
-        <div className="w-8 h-8 bg-gray-600 dark:bg-gray-200 rounded-full"></div>
-
+      <div className="w-40 truncate">
         <Popover>
           <PopoverTrigger>
-            <h6 className="font-normal text-gray-700 dark:text-gray-200">
-              Eldar Dautović
-            </h6>
+            <div className="flex items-center gap-x-2">
+              <Avatar>
+                <AvatarImage src={user?.image} />
+                <AvatarFallback>
+                  {user?.name ? getInitials(user.name) : "NA"}
+                </AvatarFallback>
+              </Avatar>
+              {isLoading ? (
+                <span className="fill-orange-400 dark:fill-orange-400 flex">
+                  <IconSpinner />
+                </span>
+              ) : (
+                <h6 className="font-normal w-full text-gray-700 dark:text-gray-200">
+                  {user?.name ?? "John Doe"}
+                </h6>
+              )}
+            </div>
           </PopoverTrigger>
           <PopoverContent className="w-48">
             <Button variant="link" onClick={() => logout()}>
