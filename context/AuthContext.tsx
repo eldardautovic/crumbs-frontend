@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
-import apiClient from '@/lib/axios';
-import { User } from '@/types/user/user';
+import IconSpinner from "@/components/Icons/IconSpinner";
+import Spinner from "@/components/ui/Spinner";
+import apiClient from "@/lib/axios";
+import { User } from "@/types/user/user";
 
 export interface AuthContextType {
   user: User | null;
@@ -14,14 +16,16 @@ export interface AuthContextType {
 
 export const AuthContext = React.createContext<AuthContextType | null>(null);
 
-const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setIsLoading(true);
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     apiClient.defaults.headers.common.Authorization = `Bearer ${token}`;
     getUserProfile();
   }, []);
@@ -29,11 +33,17 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const getUserProfile = async () => {
     let isAuthenticated = false;
     try {
-      const { data } = await apiClient.get<{ data: User }>('/user/profile');
+      const { data } = await apiClient.get<{ data: User }>("/user");
       setUser(data.data);
       isAuthenticated = true;
+      if (
+        router.pathname.includes("login") ||
+        (router.pathname.includes("register") && data)
+      ) {
+        router.push("/");
+      }
     } catch (err) {
-      delete apiClient.defaults.headers.common['Authorization'];
+      delete apiClient.defaults.headers.common["Authorization"];
     } finally {
       setIsLoading(false);
     }
@@ -41,21 +51,26 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
   const authenticateUser = async (token: string) => {
     try {
-      await localStorage.setItem('token', token);
+      await localStorage.setItem("token", token);
       apiClient.defaults.headers.common.Authorization = `Bearer ${token}`;
       await getUserProfile();
-      router.push('/');
+      router.push("/");
     } catch (error) {
       throw error;
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await apiClient.post("/user/logout");
     delete apiClient.defaults.headers.common.Authorization;
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setUser(null);
-    router.push('/');
+    router.push("/login");
   };
+
+  if (isLoading) {
+    return <Spinner />;
+  }
   return (
     <AuthContext.Provider
       value={{

@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.spinner_z9k8 {
+  transform-origin: center;
+  animation: spinner_StKS 0.75s infinite linear;
+}
+
+@keyframes spinner_StKS {
+  100% {
+    transform: rotate(360deg);
+  }
+}

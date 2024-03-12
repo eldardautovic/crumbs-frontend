@@ -2,37 +2,40 @@
 
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Label } from "@radix-ui/react-label";
+import clsx from "clsx";
 import Link from "next/link";
 
 import useAuth from "@/hooks/useAuth";
 import apiClient from "@/lib/axios";
-import { RegisterUser, RegisterUserResponse } from "@/types/auth/auth";
+import { LoginUser, LoginUserResponse } from "@/types/auth/auth";
 import { ResponseData } from "@/types/response/response";
 
 import IconLogo from "../Icons/IconLogo";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 
-const RegisterForm = () => {
+const LoginForm = () => {
   const [loading, setLoading] = useState(false);
 
-  const { handleSubmit, register } = useForm<RegisterUser>();
-
+  const { register, handleSubmit } = useForm<LoginUser>();
   const { authenticateUser } = useAuth();
 
-  const onSubmit = async (data: RegisterUser) => {
+  const onSubmit = async (data: LoginUser) => {
     try {
       setLoading(true);
 
-      const response = await apiClient.post<ResponseData<RegisterUserResponse>>(
-        "/register",
+      const response = await apiClient.post<ResponseData<LoginUserResponse>>(
+        "/login",
         data
       );
 
-      await authenticateUser(response.data.data.token);
+      if (response) {
+        await authenticateUser(response.data.data.token);
+      }
     } catch (err) {
       console.log(err);
+      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -40,13 +43,13 @@ const RegisterForm = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <section className="flex flex-row-reverse justify-center items-center min-h-[90vh]">
+      <section className="flex justify-center gap-x-32 items-center min-h-[90vh]">
         <div>
           <span className="dark:fill-gray-400 fill-gray-600">
             <IconLogo width={400} />
           </span>
         </div>
-        <div className="flex items-center min-h-[400px] px-6 xl:px-10 w-1/2">
+        <div className="flex items-center min-h-[400px] px-6 xl:px-10">
           <div className="hidden border-r lg:flex" />
           <div className="mx-auto flex-1 space-y-6 max-w-[400px]">
             <div className="space-y-2">
@@ -61,26 +64,6 @@ const RegisterForm = () => {
             </div>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Name</Label>
-                <Input
-                  id="name"
-                  placeholder="John Doe"
-                  type="text"
-                  {...register("name", { required: true })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  placeholder="john.doe"
-                  type="text"
-                  {...register("username", {
-                    required: true,
-                  })}
-                />
-              </div>
-              <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
@@ -94,38 +77,25 @@ const RegisterForm = () => {
                 <Input
                   id="password"
                   type="password"
-                  {...register("password", {
-                    required: true,
-                  })}
+                  {...register("password", { required: true })}
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm password</Label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  {...register("password_confirmation", {
-                    required: true,
-                  })}
-                />
-              </div>
-              <Button className="w-full" disabled={loading}>
-                Sign up
+              <Button className="w-full" type="submit" disabled={loading}>
+                Sign in
               </Button>
               <div className="flex items-center justify-center space-x-4">
                 <div className="w-1/2 border-t border-gray-200 dark:border-gray-800" />
                 <p className="text-sm text-gray-500 dark:text-gray-400">OR</p>
                 <div className="w-1/2 border-t border-gray-200 dark:border-gray-800" />
               </div>
-              <div>
-                <Link href="/login">
+              <div className={clsx({ "pointer-events-none": loading })}>
+                <Link href="/register">
                   <Button
                     className="w-full"
                     variant="outline"
-                    type="submit"
                     disabled={loading}
                   >
-                    Sign in
+                    Sign up
                   </Button>
                 </Link>
               </div>
@@ -137,4 +107,4 @@ const RegisterForm = () => {
   );
 };
 
-export default RegisterForm;
+export default LoginForm;
