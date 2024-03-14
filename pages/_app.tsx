@@ -1,6 +1,7 @@
 import { lazy } from "react";
 import type { AppLayoutProps } from "next/app";
 import { ThemeProvider } from "next-themes";
+import Pusher from "pusher-js";
 
 import { Toaster } from "@/components/ui/toaster";
 import { LayoutName, Layouts } from "@/layouts";

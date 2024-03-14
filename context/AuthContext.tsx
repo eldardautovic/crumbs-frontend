@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import pusherJs from "pusher-js";
 
-import Spinner from "@/components/ui/Spinner";
+import IconHome from "@/components/Icons/IconHome";
+import IconLogo from "@/components/Icons/IconLogo";
+import IconSpinner from "@/components/Icons/IconSpinner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/useToast";
 import apiClient from "@/lib/axios";
 import { ResponseData } from "@/types/response/response";
 import { User, VerifyUser } from "@/types/user/user";
+import { getInitials } from "@/utils/helpers";
 
 export interface AuthContextType {
   user: User | null;
@@ -46,6 +51,42 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       ) {
         router.push("/");
       }
+      const pusher = new pusherJs("787aa887151da6af2ade", {
+        cluster: "eu",
+        forceTLS: false,
+        authEndpoint:
+          process.env.NEXT_PUBLIC_API_URL + "/api/broadcasting/auth",
+        auth: {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+            Accept: "application/json",
+          },
+        },
+      });
+
+      const channel = pusher.subscribe("private-user." + data.data.user.id);
+
+      channel.bind(
+        "Illuminate\\Notifications\\Events\\BroadcastNotificationCreated",
+        (response: any) => {
+          toast({
+            action: (
+              <div className="flex items-center gap-x-2 w-full">
+                <Avatar>
+                  <AvatarImage src={response.image} />
+                  <AvatarFallback>
+                    {user?.name ? getInitials(response.name) : "NA"}
+                  </AvatarFallback>
+                </Avatar>
+
+                <h6 className="font-normal w-full text-gray-700 dark:text-gray-200">
+                  {response.name ?? "John Doe"}
+                </h6>
+              </div>
+            ),
+          });
+        }
+      );
     } catch (err) {
       delete apiClient.defaults.headers.common["Authorization"];
     } finally {

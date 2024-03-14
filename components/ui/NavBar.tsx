@@ -1,8 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
 import { useTheme } from "next-themes";
+import pusherJs from "pusher-js";
 
 import useAuth from "@/hooks/useAuth";
+import { useToast } from "@/hooks/useToast";
+import { getInitials } from "@/utils/helpers";
 
 import IconDarkMode from "../Icons/IconDarkMode";
 import IconLightMode from "../Icons/IconLightMode";
@@ -16,13 +20,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 const NavBar = () => {
   const { setTheme, theme } = useTheme();
   const { logout, user, isLoading } = useAuth();
-
-  function getInitials(name: string) {
-    const nameArray = name.split(" ");
-    const firstNameIn = nameArray[0].charAt(0).toUpperCase();
-    const lastNameIn = nameArray[nameArray.length - 1].charAt(0).toUpperCase();
-    return firstNameIn + lastNameIn;
-  }
 
   return (
     <nav className="py-5 flex justify-between items-center">
