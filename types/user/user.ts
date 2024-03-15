@@ -7,8 +7,3 @@ export interface User {
   created_at: string;
   image: string;
 }
-
-export interface VerifyUser {
-  user: User;
-  token: string;
-}

@@ -2,14 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import pusherJs from "pusher-js";
 
-import IconHome from "@/components/Icons/IconHome";
-import IconLogo from "@/components/Icons/IconLogo";
-import IconSpinner from "@/components/Icons/IconSpinner";
+import Notification from "@/components/Notification/Notification";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/useToast";
 import apiClient from "@/lib/axios";
 import { ResponseData } from "@/types/response/response";
-import { User, VerifyUser } from "@/types/user/user";
+import { User } from "@/types/user/user";
 import { getInitials } from "@/utils/helpers";
 
 export interface AuthContextType {
@@ -42,12 +40,13 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const getUserProfile = async () => {
     let isAuthenticated = false;
     try {
-      const { data } = await apiClient.get<ResponseData<VerifyUser>>("/user");
-      setUser(data.data.user);
+      const { data } = await apiClient.get<ResponseData<User>>("/user");
+      setUser(data.data);
+
       isAuthenticated = true;
       if (
         router.pathname.includes("login") ||
-        (router.pathname.includes("register") && data)
+        (router.pathname.includes("register") && data.data)
       ) {
         router.push("/");
       }
@@ -64,26 +63,13 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         },
       });
 
-      const channel = pusher.subscribe("private-user." + data.data.user.id);
+      const channel = pusher.subscribe("private-user." + data.data.id);
 
       channel.bind(
         "Illuminate\\Notifications\\Events\\BroadcastNotificationCreated",
         (response: any) => {
           toast({
-            action: (
-              <div className="flex items-center gap-x-2 w-full">
-                <Avatar>
-                  <AvatarImage src={response.image} />
-                  <AvatarFallback>
-                    {user?.name ? getInitials(response.name) : "NA"}
-                  </AvatarFallback>
-                </Avatar>
-
-                <h6 className="font-normal w-full text-gray-700 dark:text-gray-200">
-                  {response.name ?? "John Doe"}
-                </h6>
-              </div>
-            ),
+            action: <Notification user={data.data} response={response} />,
           });
         }
       );
@@ -114,9 +100,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     toast({ title: "Logged out", description: "Successfully logged out." });
   };
 
-  // if (isLoading) {
-  //   return <Spinner />;
-  // }
   return (
     <AuthContext.Provider
       value={{

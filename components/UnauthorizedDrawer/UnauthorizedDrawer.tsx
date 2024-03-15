@@ -19,6 +19,7 @@ const UnauthorizedDrawer = () => {
   const router = useRouter();
 
   const { user, isLoading } = useAuth();
+
   return (
     <div>
       <Drawer open={!user && !isLoading} dismissible={false}>
