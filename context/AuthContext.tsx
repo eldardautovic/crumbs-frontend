@@ -13,6 +13,7 @@ export interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   getUserProfile: () => Promise<void>;
+  getUserNotifications: () => Promise<void>;
   authenticateUser: (token: string) => Promise<void>;
   logout: () => void;
   notifications: NotificationType[];
@@ -73,6 +74,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           toast({
             action: <Notification user={data.data} response={response} />,
           });
+          getUserNotifications();
         }
       );
     } catch (err) {
@@ -96,7 +98,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const getUserNotifications = async () => {
     try {
       const { data } = await apiClient.get<{ data: NotificationType[] }>(
-        "/notifications",
+        "/notifications?perPage=5",
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         }
@@ -122,6 +124,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         user,
         getUserProfile,
+        getUserNotifications,
         authenticateUser,
         logout,
         isLoading,

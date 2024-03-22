@@ -5,4 +5,5 @@ export interface Notification {
   user: User;
   created_at: string;
   read: boolean;
+  description: string;
 }

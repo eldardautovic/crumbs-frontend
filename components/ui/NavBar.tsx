@@ -1,14 +1,17 @@
 "use client";
 
+import axios, { AxiosError } from "axios";
+import Link from "next/link";
 import { useTheme } from "next-themes";
 
 import useAuth from "@/hooks/useAuth";
+import { useToast } from "@/hooks/useToast";
+import apiClient from "@/lib/axios";
 import { getInitials } from "@/utils/helpers";
 
 import IconDarkMode from "../Icons/IconDarkMode";
 import IconLightMode from "../Icons/IconLightMode";
 import IconLogo from "../Icons/IconLogo";
-import IconSpinner from "../Icons/IconSpinner";
 import NotificationBell from "../NotificationBell/NotificationBell";
 import NotificationItem from "../NotificationItem/NotificationItem";
 
@@ -17,8 +20,31 @@ import { Button } from "./button";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
 const NavBar = () => {
+  const { toast } = useToast();
   const { setTheme, theme } = useTheme();
-  const { logout, user, isLoading, notifications } = useAuth();
+  const { logout, user, notifications, getUserNotifications } = useAuth();
+
+  const handleReadNotification = async () => {
+    if (!notifications.filter((notification) => !notification.read).length) {
+      return;
+    }
+
+    try {
+      await apiClient.post("/notifications/readAll");
+
+      await getUserNotifications();
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: err.response?.data.message,
+        });
+      } else {
+        console.error(err);
+      }
+    }
+  };
 
   return (
     <nav className="py-5 flex justify-between items-center">
@@ -32,7 +58,7 @@ const NavBar = () => {
       </div>
       <div className="w-40 flex items-center truncate">
         <Popover>
-          <PopoverTrigger>
+          <PopoverTrigger onClick={() => handleReadNotification()}>
             <div className="mr-2">
               <NotificationBell />
             </div>
@@ -42,6 +68,15 @@ const NavBar = () => {
               notifications.map((notification) => (
                 <NotificationItem key={notification.id} {...notification} />
               ))}
+
+            {notifications.length > 0 ? (
+              <Link
+                href="/notifications"
+                className="text-center font-medium text-sm cursor-pointer"
+              >
+                Show more
+              </Link>
+            ) : null}
           </PopoverContent>
         </Popover>
         <Popover>

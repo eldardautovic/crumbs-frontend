@@ -12,9 +12,12 @@ const NotificationBell = () => {
       <span className="stroke-gray-200 w-5 h-5 relative">
         <IconBell />
       </span>
-      {notifications.length > 0 && (
+      {notifications.filter((notification) => !notification.read).length >
+        0 && (
         <div className="text-[8px] line-clamp-none bg-red-500 rounded-full absolute right-0 px-1 top-0">
-          <p>{notifications.length}</p>
+          <p>
+            {notifications.filter((notification) => !notification.read).length}
+          </p>
         </div>
       )}
     </div>
