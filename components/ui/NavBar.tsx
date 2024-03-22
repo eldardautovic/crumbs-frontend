@@ -1,17 +1,16 @@
 "use client";
 
-import { useEffect } from "react";
 import { useTheme } from "next-themes";
-import pusherJs from "pusher-js";
 
 import useAuth from "@/hooks/useAuth";
-import { useToast } from "@/hooks/useToast";
 import { getInitials } from "@/utils/helpers";
 
 import IconDarkMode from "../Icons/IconDarkMode";
 import IconLightMode from "../Icons/IconLightMode";
 import IconLogo from "../Icons/IconLogo";
 import IconSpinner from "../Icons/IconSpinner";
+import NotificationBell from "../NotificationBell/NotificationBell";
+import NotificationItem from "../NotificationItem/NotificationItem";
 
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { Button } from "./button";
@@ -19,7 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 
 const NavBar = () => {
   const { setTheme, theme } = useTheme();
-  const { logout, user, isLoading } = useAuth();
+  const { logout, user, isLoading, notifications } = useAuth();
 
   return (
     <nav className="py-5 flex justify-between items-center">
@@ -31,25 +30,29 @@ const NavBar = () => {
           crumbs.
         </h5>
       </div>
-      <div className="w-40 truncate">
+      <div className="w-40 flex items-center truncate">
+        <Popover>
+          <PopoverTrigger>
+            <div className="mr-2">
+              <NotificationBell />
+            </div>
+          </PopoverTrigger>
+          <PopoverContent className="w-96 flex flex-col gap-y-4">
+            {notifications.length &&
+              notifications.map((notification) => (
+                <NotificationItem key={notification.id} {...notification} />
+              ))}
+          </PopoverContent>
+        </Popover>
         <Popover>
           <PopoverTrigger>
             <div className="flex items-center gap-x-2">
               <Avatar>
                 <AvatarImage src={user?.image} />
                 <AvatarFallback>
-                  {user?.name ? getInitials(user.name) : "NA"}
+                  {user?.name ? getInitials(user.name) : ""}
                 </AvatarFallback>
               </Avatar>
-              {isLoading ? (
-                <span className="fill-orange-400 dark:fill-orange-400 flex">
-                  <IconSpinner />
-                </span>
-              ) : (
-                <h6 className="font-normal w-full text-gray-700 dark:text-gray-200">
-                  {user?.name ?? "John Doe"}
-                </h6>
-              )}
             </div>
           </PopoverTrigger>
           <PopoverContent className="w-48">

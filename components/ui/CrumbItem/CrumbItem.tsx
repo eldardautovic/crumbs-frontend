@@ -1,20 +1,56 @@
-import React from "react";
+"use client";
+
+import { useState } from "react";
+import { AxiosError } from "axios";
 import clsx from "clsx";
 import Image from "next/image";
 
-import { Crumb } from "@/types/crumbs/crumbs";
+import { useToast } from "@/hooks/useToast";
+import apiClient from "@/lib/axios";
+import { Crumb, CrumbRequest } from "@/types/crumbs/crumbs";
+import { ResponseData } from "@/types/response/response";
 
 import { Button } from "../button";
 
 type CrumbItemProps = Crumb;
 
 const CrumbItem: React.FC<CrumbItemProps> = ({
+  id,
   name,
   image,
   description,
   members_count,
   privacy,
 }) => {
+  const { toast } = useToast();
+
+  const [loading, setLoading] = useState(false);
+
+  const handleJoin = async () => {
+    try {
+      setLoading(true);
+
+      await apiClient.post<ResponseData<CrumbRequest>>(`/group/join/${id}`);
+
+      toast({
+        title: "Request sent",
+        description: "Request sent successfully.",
+      });
+    } catch (err) {
+      if (err instanceof AxiosError) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: err.response?.data.message,
+        });
+      } else {
+        console.error(err);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="relative hover:z-10 w-80 h-32 rounded bg-center bg-cover backdrop-filter hover:scale-125 group transition-all duration-500 ease-in-out cursor-pointer">
       <div
@@ -54,7 +90,12 @@ const CrumbItem: React.FC<CrumbItemProps> = ({
         <p className="text-xs text-gray-300 dark:text-gray-400 flex break-all mb-2">
           {description}
         </p>
-        <Button className="w-full mt-2" size="sm">
+        <Button
+          className="w-full mt-2"
+          size="sm"
+          onClick={() => handleJoin()}
+          disabled={loading}
+        >
           {privacy ? "Request access" : "Join"}
         </Button>
       </div>

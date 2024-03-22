@@ -3,12 +3,11 @@ import { useRouter } from "next/router";
 import pusherJs from "pusher-js";
 
 import Notification from "@/components/Notification/Notification";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/useToast";
 import apiClient from "@/lib/axios";
+import { Notification as NotificationType } from "@/types/notifications/notifications";
 import { ResponseData } from "@/types/response/response";
 import { User } from "@/types/user/user";
-import { getInitials } from "@/utils/helpers";
 
 export interface AuthContextType {
   user: User | null;
@@ -16,6 +15,7 @@ export interface AuthContextType {
   getUserProfile: () => Promise<void>;
   authenticateUser: (token: string) => Promise<void>;
   logout: () => void;
+  notifications: NotificationType[];
 }
 
 export const AuthContext = React.createContext<AuthContextType | null>(null);
@@ -25,6 +25,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const { toast } = useToast();
@@ -34,6 +35,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     const token = localStorage.getItem("token");
     apiClient.defaults.headers.common.Authorization = `Bearer ${token}`;
     getUserProfile();
+    getUserNotifications();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -91,6 +93,21 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const getUserNotifications = async () => {
+    try {
+      const { data } = await apiClient.get<{ data: NotificationType[] }>(
+        "/notifications",
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        }
+      );
+
+      setNotifications(data.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const logout = async () => {
     await apiClient.post("/user/logout");
     delete apiClient.defaults.headers.common.Authorization;
@@ -108,6 +125,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         authenticateUser,
         logout,
         isLoading,
+        notifications,
       }}
     >
       {children}

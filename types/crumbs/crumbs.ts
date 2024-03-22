@@ -13,3 +13,11 @@ export interface CrumbAdmin {
   id: string;
   name: string;
 }
+
+export interface CrumbRequest {
+  id: number;
+  group_id: number;
+  user_id: number;
+  updated_at: string;
+  created_at: string;
+}
