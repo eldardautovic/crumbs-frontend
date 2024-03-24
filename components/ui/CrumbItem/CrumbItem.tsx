@@ -75,7 +75,7 @@ const CrumbItem: React.FC<CrumbItemProps> = ({
             { "!z-0": !image }
           )}
         >
-          {name} ee
+          {name}
         </span>
       </div>
 

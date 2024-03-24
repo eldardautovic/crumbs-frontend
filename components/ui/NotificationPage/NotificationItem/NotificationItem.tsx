@@ -1,4 +1,3 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import dayjs from "dayjs";
 
 import { Notification } from "@/types/notifications/notifications";
@@ -7,6 +6,8 @@ import { getInitials } from "@/utils/helpers";
 type NotificationItemProps = Notification;
 
 import relativeTime from "dayjs/plugin/relativeTime";
+
+import { Avatar, AvatarFallback, AvatarImage } from "../../avatar";
 dayjs.extend(relativeTime);
 
 const NotificationItem: React.FC<NotificationItemProps> = ({

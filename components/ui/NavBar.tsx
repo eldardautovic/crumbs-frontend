@@ -2,6 +2,7 @@
 
 import axios, { AxiosError } from "axios";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { useTheme } from "next-themes";
 
 import useAuth from "@/hooks/useAuth";
@@ -23,6 +24,7 @@ const NavBar = () => {
   const { toast } = useToast();
   const { setTheme, theme } = useTheme();
   const { logout, user, notifications, getUserNotifications } = useAuth();
+  const router = useRouter();
 
   const handleReadNotification = async () => {
     if (!notifications.filter((notification) => !notification.read).length) {
@@ -56,7 +58,7 @@ const NavBar = () => {
           crumbs.
         </h5>
       </div>
-      <div className="w-40 flex items-center truncate">
+      <div className="w-40 flex items-center justify-end truncate">
         <Popover>
           <PopoverTrigger onClick={() => handleReadNotification()}>
             <div className="mr-2">
@@ -90,7 +92,10 @@ const NavBar = () => {
               </Avatar>
             </div>
           </PopoverTrigger>
-          <PopoverContent className="w-48">
+          <PopoverContent className="w-48 flex flex-col gap-y-2 items-start">
+            <Button variant="link" onClick={() => router.push("/settings")}>
+              Profile
+            </Button>
             <Button variant="link" onClick={() => logout()}>
               Logout
             </Button>
